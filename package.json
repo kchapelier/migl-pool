@@ -11,9 +11,9 @@
     "url": "git://github.com/kchapelier/migl-pool.git"
   },
   "keywords": [
-    "migl",
     "game",
-    "pool"
+    "pool",
+    "object pool"
   ],
   "author": "Kevin Chapelier",
   "license": "MIT",
