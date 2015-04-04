@@ -21,10 +21,12 @@ Pool.prototype.availableInstances = null;
 Pool.prototype.totalInstances = null;
 Pool.prototype.factoryFunction = null;
 Pool.prototype.initializeFunction = null;
+Pool.prototype.allocationNumber = null;
 
 /**
  * Instantiate a given number of elements and add them to the collection of available instances
  * @param {number} number Number of elements to allocate
+ * @private
  * @returns {Pool} Own instance for fluent interface
  */
 Pool.prototype.allocate = function (number) {
@@ -81,19 +83,34 @@ Pool.prototype.clear = function () {
         this.availableInstances.pop();
     }
 
+    this.totalInstances = 0;
+
     return this;
 };
 
+/**
+ * Obtain a string containing information about the pool
+ * @returns {string} Information about the pool
+ */
+Pool.prototype.toString = function () {
+    return this.name + ' : ' + this.totalInstances + ' total instances, ' + this.availableInstances.length + ' available instances';
+};
+
 module.exports = {
+    /**
+     * Create an object pool
+     * @param {Object} options Pool options (name, factory, initialize, firstAllocationNumber, allocationNumber)
+     * @returns {Pool} Instance of the object pool
+     */
     create: function (options) {
         poolId++;
 
         return new Pool(
-            options.name ? options.name + ' (' + 'Pool #' + poolId + ')' : 'Pool #' + poolId,
+            options.name ? options.name + ' (pool #' + poolId + ')' : 'pool #' + poolId,
             options.factory,
             options.initialize || noop,
-            options.firstAllocationNumber || 40,
-            options.allocationNumber || 5
+            options.firstAllocationNumber || 20,
+            options.allocationNumber || 1
         );
     }
 };
