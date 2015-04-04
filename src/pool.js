@@ -3,15 +3,17 @@
 var poolId = 0,
     noop = function () {};
 
-var Pool = function (name, factory, initialize, initialNumber) {
+var Pool = function (name, factory, initialize, firstAllocationNumber, allocationNumber) {
     this.name = name;
     this.factoryFunction = factory;
     this.initializeFunction = initialize;
     this.totalInstances = 0;
 
+    this.allocationNumber = allocationNumber;
+
     this.availableInstances = [];
 
-    this.allocate(initialNumber);
+    this.allocate(firstAllocationNumber);
 };
 
 Pool.prototype.name = null;
@@ -20,6 +22,11 @@ Pool.prototype.totalInstances = null;
 Pool.prototype.factoryFunction = null;
 Pool.prototype.initializeFunction = null;
 
+/**
+ * Instantiate a given number of elements and add them to the collection of available instances
+ * @param {number} number Number of elements to allocate
+ * @returns {Pool} Own instance for fluent interface
+ */
 Pool.prototype.allocate = function (number) {
     var i;
 
@@ -33,15 +40,16 @@ Pool.prototype.allocate = function (number) {
 };
 
 /**
- *
+ * Retrieve an element for the collection of available instances, (re)initialize and return it.
  * @param {Object} initializationOptions Options to pass to the initialize function
- * @returns {*}
+ * @returns {Object} Initialized element
  */
 Pool.prototype.get = function (initializationOptions) {
     var element;
 
+    // check if we still have enough available instances, instantiate new ones
     if (this.availableInstances.length < 1) {
-        this.allocate(5);
+        this.allocate(this.allocationNumber);
     }
 
     element = this.availableInstances.pop();
@@ -84,7 +92,8 @@ module.exports = {
             options.name ? options.name + ' (' + 'Pool #' + poolId + ')' : 'Pool #' + poolId,
             options.factory,
             options.initialize || noop,
-            options.initialNumber || 40
+            options.firstAllocationNumber || 40,
+            options.allocationNumber || 5
         );
     }
 };
